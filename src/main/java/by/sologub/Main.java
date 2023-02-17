@@ -11,21 +11,22 @@ import java.util.stream.DoubleStream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        task1();
-        task2();
-        task3();
-        task4();
-        task5();
-        task6();
-        task7();
-        task8();
-        task9();
-        task10();
-        task11();
-        task12();
-        task13();
-        task14();
-        task15();
+//        task1();
+//        task2();
+//        task3();
+//        task4();
+//        task5();
+//        task6();
+//        task7();
+//        task8();
+//        task9();
+//        task10();
+//        task11();
+//        task12();
+//        task13();
+//        task14();
+//        task15();
+        task16();
     }
 
     private static void task1() throws IOException {
@@ -157,17 +158,34 @@ public class Main {
         int profit = (int) (revenue(turkmenistan) + revenue(uzbekistan) + revenue(kazahstan) +revenue(kirgizstan) +revenue(russia) +
                         revenue(mongolia) - expenses);
         System.out.print("Общий доход компании = "+ profit + "$");
-
-
     }
 
     private static void task15() throws IOException {
         List<Flower> flowers = Util.getFlowers();
         List<Flower> myflowers = new LinkedList<>();
-        flowers.stream().sorted(Comparator.comparing(Flower::getOrigin).reversed())
+        double summProfit = flowers.stream().sorted(Comparator.comparing(Flower::getOrigin).reversed())
                 .sorted(Comparator.comparing(Flower::getPrice).reversed())
                 .sorted(Comparator.comparing(Flower::getWaterConsumptionPerDay).reversed())
-                .filter(s->s.getCommonName().matches("^[C-X]\\w*")).filter(Flower::isShadePreferred).map(flo->flo.getFlowerVaseMaterial())
-                .flatMap(sos->sos.stream()).filter(s->s.equals("Glass")||s.equals("Aluminum")||s.equals("Steel")).map(flover-> new Flower()).forEach(s->myflowers.add(s));
+                .filter(s->s.getCommonName().matches("^[C-X]\\w*")).filter(Flower::isShadePreferred)
+                .filter(s->s.getFlowerVaseMaterial().contains("Glass")||s.getFlowerVaseMaterial().contains("Aluminum")||s.getFlowerVaseMaterial().contains("Steel"))
+                .mapToDouble(s->s.getWaterConsumptionPerDay()/1000*365*1.39*5).sum();
+        System.out.println("Затраты на потребление = " + summProfit);
+    }
+
+    /**
+     * Цунами затопило всю территорию и потом ещё случился взрыв вулкана и землятрясение. Погибли все оставшиеся. Вывести список.
+     *
+     */
+    private static void task16() throws IOException {
+        List<House> houses = Util.getHouses();
+        List<Person> people = new ArrayList<>();
+        houses.stream().filter(s->s.getBuildingType().equals("Hospital")).map(House::getPersonList).flatMap(Collection::stream).forEach(people::add);
+        houses.stream().filter(s->!s.getBuildingType().equals("Hospital"))
+                .map(House::getPersonList).flatMap(Collection::stream)
+                .filter(d-> LocalDate.now().getYear()-d.getDateOfBirth().getYear()<18||LocalDate.now().getYear()-d.getDateOfBirth().getYear()>=63&&d.getGender().equals("Male")||
+                        LocalDate.now().getYear()-d.getDateOfBirth().getYear()>=58&&d.getGender().equals("Female"))
+                .skip(500-people.size()).forEach(people::add);
+        people.forEach(System.out::println);
+        System.out.println(people.size());
     }
 }
